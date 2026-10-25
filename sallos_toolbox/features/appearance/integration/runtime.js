@@ -94,6 +94,8 @@ function themeCSS(input, root = 'html[data-plugin-appearance]') {
   const variables = Object.entries(tokens).map(([key, value]) => `--color-${key}:${hsl(value)}!important;`).join('');
   const sizes = { xs: 0.75, sm: 0.875, base: 1, lg: 1.125, xl: 1.25, '2xl': 1.5 };
   const typography = Object.entries(sizes).map(([key, scale]) => `--typography-font-size-${key}:${t.font_size * scale}px!important;`).join('');
+  // Dashboard also uses bg-card on its sidebar; card customization must stay within content surfaces.
+  const cards = '.bg-card:not([data-dashboard-sidebar]):not([data-dashboard-header]):not([data-dashboard-main])';
   const region = (selector, declarations) => declarations ? `${root} ${selector}{${declarations.split(';').filter(s => s.trim()).map(s => `${s}!important;`).join('')}}` : '';
   return `${root}{${variables}${typography}
     --typography-font-family-base:${FONTS[t.font]}!important;--typography-line-height-normal:${t.line_height}!important;
@@ -103,10 +105,10 @@ function themeCSS(input, root = 'html[data-plugin-appearance]') {
     --visual-radius-xl:${t.radius + 4}px!important;--visual-shadow-sm:${shadow}!important;--visual-shadow-md:${shadow}!important;
     font-family:${FONTS[t.font]};font-size:${t.font_size}px;line-height:${t.line_height};
     background:${t.background};color:${t.text};color-scheme:${t.mode === 'system' ? 'light dark' : t.mode};}
-    ${root} [data-dashboard-sidebar]{background:color-mix(in srgb, ${t.background} 85%, transparent)!important;color:${t.text}!important;backdrop-filter:blur(20px);}
-    ${root} [data-dashboard-header]{background:color-mix(in srgb, ${t.surface} 88%, transparent)!important;color:${t.text}!important;backdrop-filter:blur(20px);}
+    ${root} :is([data-dashboard-sidebar],[data-dashboard-header]){background:color-mix(in srgb, ${t.surface} 88%, transparent)!important;color:${t.text}!important;backdrop-filter:blur(20px);
+      border-color:${t.border}!important;border-radius:0!important;box-shadow:none!important;}
     ${root} [data-dashboard-main]{background:${t.background}!important;color:${t.text}!important;}
-    ${root} .bg-card{background:${t.surface}!important;color:${t.text}!important;border-color:${t.border}!important;
+    ${root} ${cards}{background:${t.surface}!important;color:${t.text}!important;border-color:${t.border}!important;
       border-radius:${t.radius}px!important;box-shadow:${shadow}!important;}
     @media(min-width:1024px){
       ${root} [data-dashboard-sidebar-layout]{order:${t.sidebar_side === 'right' ? 2 : 0};}
@@ -115,6 +117,7 @@ function themeCSS(input, root = 'html[data-plugin-appearance]') {
       ${root} [data-dashboard-header]:not([data-dashboard-header-collapsed="true"]){padding-inline:16px!important;}
       ${root} [data-dashboard-header]:not([data-dashboard-header-collapsed="true"]):has([data-dashboard-sidebar-mode-switch]){padding-inline-start:44px!important;}
       ${root} [data-dashboard-logo-area]{height:var(--layout-header-height)!important;min-height:var(--layout-header-height);padding-right:60px!important;}
+      ${root} [data-dashboard-logo-area]{border-bottom:1px solid ${t.border}!important;}
       ${root} [data-dashboard-logo-area]>div:first-child{width:100%!important;min-width:0;}
       ${root} [data-dashboard-logo-area]>div:first-child>div{max-width:100%;min-width:0;}
       ${root} [data-dashboard-logo-title]{min-width:0;overflow:hidden;text-overflow:ellipsis;}
@@ -139,7 +142,7 @@ function themeCSS(input, root = 'html[data-plugin-appearance]') {
     @media(prefers-reduced-transparency:reduce){${root} [data-dashboard-sidebar],${root} [data-dashboard-header]{background:${t.surface}!important;backdrop-filter:none;}}
     ${region('[data-dashboard-sidebar]', t.regions.sidebar)}
     ${region('[data-dashboard-header]', t.regions.header)}
-    ${region('.bg-card', t.regions.card)}`;
+    ${region(cards, t.regions.card)}`;
 }
 
 // Executed in the Dashboard document; consumes only validated, public appearance data.

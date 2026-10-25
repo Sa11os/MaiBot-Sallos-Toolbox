@@ -23,6 +23,23 @@ async def geometry(page, selector):
     )
 
 
+async def check_navigation_surface(page):
+    styles = await page.evaluate("""() => {
+      const read = selector => {
+        const e = document.querySelector(selector), s = getComputedStyle(e);
+        return {radius:s.borderRadius, shadow:s.boxShadow, background:s.backgroundColor,
+          bottom:s.borderBottom, right:e.getBoundingClientRect().right};
+      };
+      return {sidebar:read('[data-dashboard-sidebar]'), logo:read('[data-dashboard-logo-area]'),
+        header:read('[data-dashboard-header]'), card:read('[data-dashboard-card]')};
+    }""")
+    assert styles["sidebar"]["radius"] == "0px", ("navigation inherited card radius", styles)
+    assert styles["sidebar"]["shadow"] == "none", ("navigation inherited card shadow", styles)
+    assert styles["sidebar"]["background"] == styles["header"]["background"], ("navigation surface", styles)
+    assert styles["logo"]["bottom"] == styles["header"]["bottom"], ("navigation divider", styles)
+    assert styles["card"]["radius"] in {"16px", "24px"}, ("content card radius", styles)
+
+
 async def check_alignment(page, button_selector, height):
     header = await geometry(page, "[data-dashboard-header]")
     logo = await geometry(page, "[data-dashboard-logo-area]")
@@ -93,6 +110,10 @@ async def main():
                                     "header_height": height,
                                     "sidebar_width": width,
                                     "font_size": 22 if width == 160 else 16,
+                                    "radius": 24 if width == 160 else 16,
+                                    "shadow": "crisp" if width == 160 else "soft",
+                                    "regions": {"card": "border-radius:24px;box-shadow:4px 4px 0 #D2D2D7"}
+                                    if width == 160 else {},
                                 },
                             )
                             await page.wait_for_function(
@@ -104,6 +125,7 @@ async def main():
                             )
                             await page.wait_for_timeout(300)
                             await check_alignment(page, mode, height)
+                            await check_navigation_surface(page)
                             if height == 56:
                                 await page.screenshot(path=str(output / f"navigation-{side}.png"))
                             await page.locator(mode).click()
