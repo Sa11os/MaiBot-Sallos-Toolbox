@@ -1,5 +1,6 @@
 // Shared, DOM-free contract used by the editor and the Dashboard adapter.
 import { DEFAULT_THEME, THEME_SCHEMA, REGION_PROPERTIES } from '../generated/theme-data.js';
+import { homeLayoutCSS } from './dashboard-home.js';
 
 export const FONTS = {
   system: '"Segoe UI", "Microsoft YaHei UI", system-ui, sans-serif',
@@ -136,5 +137,6 @@ export function themeCSS(input, root = 'html[data-plugin-appearance]') {
     @media(prefers-reduced-transparency:reduce){${root} [data-dashboard-sidebar],${root} [data-dashboard-header]{background:${t.surface}!important;backdrop-filter:none;}}
     ${region('[data-dashboard-sidebar]', t.regions.sidebar)}
     ${region('[data-dashboard-header]', t.regions.header)}
-    ${region(cards, t.regions.card)}`;
+    ${region(cards, t.regions.card)}
+    ${homeLayoutCSS(root, t.gap)}`;
 }

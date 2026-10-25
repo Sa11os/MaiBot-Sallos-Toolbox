@@ -5,6 +5,59 @@ const THEME_SCHEMA = {"$defs": {"RegionStyles": {"additionalProperties": false, 
 const BUILTIN_PRESETS = [{"id": "workbench", "theme": {"version": 1, "name": "Sallos 工作台", "mode": "light", "primary": "#0071E3", "background": "#F5F5F7", "surface": "#FFFFFF", "text": "#1D1D1F", "muted": "#6E6E73", "border": "#D2D2D7", "sidebar_side": "left", "sidebar_width": 224, "header_height": 56, "content_width": 1440, "gap": 20, "font": "system", "font_size": 16, "line_height": 1.6, "radius": 16, "shadow": "soft", "regions": {"sidebar": "", "header": "", "card": ""}}}, {"id": "paper", "theme": {"version": 1, "name": "纸上书房", "mode": "light", "primary": "#975335", "background": "#F4EFE6", "surface": "#FFFDF8", "text": "#352C23", "muted": "#716251", "border": "#D7C8B4", "sidebar_side": "left", "sidebar_width": 224, "header_height": 56, "content_width": 1440, "gap": 20, "font": "serif", "font_size": 16, "line_height": 1.6, "radius": 4, "shadow": "crisp", "regions": {"sidebar": "", "header": "", "card": ""}}}, {"id": "night", "theme": {"version": 1, "name": "午夜终端", "mode": "dark", "primary": "#8ECCA6", "background": "#151D24", "surface": "#202B35", "text": "#E5EBEF", "muted": "#A6B6C4", "border": "#4A5D6A", "sidebar_side": "left", "sidebar_width": 224, "header_height": 56, "content_width": 1440, "gap": 20, "font": "mono", "font_size": 16, "line_height": 1.6, "radius": 6, "shadow": "none", "regions": {"sidebar": "", "header": "", "card": ""}}}];
 const REGION_PROPERTIES = ["background-color", "border", "border-color", "border-radius", "border-style", "border-width", "box-shadow", "color", "font-size", "font-weight", "letter-spacing", "line-height", "margin", "padding", "padding-block", "padding-inline", "text-transform"];
 
+// Dashboard 1.9.9 home layout. Keep card data, DOM order and native editing intact.
+function homeLayoutCSS(root, gap) {
+  const page = `${root} [data-home-page]`;
+  const grid = `${page} [data-home-summary-cards]:not(:has([data-home-card-edit-overlay]))`;
+  const card = `${grid}>[data-home-card-id]`;
+  return `
+    ${root} [data-dashboard-workspace-content]:has([data-home-page]){
+      max-width:none!important;width:100%;height:auto!important;min-height:100%;padding:${gap}px;}
+    ${root} [data-dashboard-main] div:has(>[data-dashboard-scrollbar-viewport] [data-home-page]){
+      height:auto!important;overflow:visible!important;}
+    ${root} [data-dashboard-main] [data-dashboard-scrollbar-viewport]:has([data-home-page]){
+      height:auto!important;overflow:visible!important;}
+    ${page}{container:toolbox-home / inline-size;padding:0!important;}
+    ${grid}{grid-template-columns:repeat(12,minmax(0,1fr))!important;grid-template-rows:none!important;
+      grid-auto-rows:auto;gap:clamp(12px,1.2vw,${gap}px)!important;align-items:stretch;}
+    ${card}{grid-column:span 12!important;height:auto!important;min-height:160px;}
+    ${card}[data-home-card-variant="separator"]{min-height:40px;}
+    ${card}>[aria-hidden="false"]{overflow:visible!important;}
+    ${grid} [data-dashboard-card-header]{padding:14px 16px 10px!important;}
+    ${grid} [data-dashboard-card-content]{padding:0 16px 14px!important;}
+    ${grid} [data-home-titleless-content]{padding:14px 16px!important;}
+    ${card}[data-home-card-id="builtin:quick-actions"] [data-home-titleless-content]{height:100%;}
+    ${card}[data-home-card-id="builtin:news"]{height:200px!important;}
+    ${grid} [data-home-storage-details]{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px 12px!important;}
+    ${grid} [data-home-storage-row]{gap:4px 6px!important;}
+    ${grid} [data-home-statistics-overview]{min-height:110px;padding-top:0!important;gap:8px!important;}
+    ${grid} [data-home-summary-secondary]{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+    ${grid} [data-dashboard-card-content]:has([data-chart])>div{
+      height:clamp(220px,25dvh,300px)!important;min-height:220px!important;flex:none;}
+    ${grid} [data-home-hitokoto]{white-space:normal;}
+    ${grid} [data-home-hitokoto] p{white-space:normal;overflow:visible;}
+    @container toolbox-home (min-width:40rem){
+      ${card}{grid-column:span 6!important;}
+      ${card}[data-home-card-variant="separator"]{grid-column:1/-1!important;}
+      ${card}[data-home-card-id="builtin:hitokoto"]{grid-column:span 6!important;}
+      ${card}[data-home-card-id="builtin:stats-overview"]{grid-column:1/-1!important;}
+      ${grid} [data-home-summary-secondary]{grid-template-columns:repeat(4,minmax(0,1fr))!important;}
+    }
+    @container toolbox-home (min-width:56rem){
+      ${card}{grid-column:span 4!important;}
+      ${card}[data-home-card-id="builtin:hitokoto"]{grid-column:1/-1!important;}
+      ${card}[data-home-card-id="builtin:stats-overview"]{grid-column:span 4!important;}
+      ${card}:is([data-home-card-id="builtin:request-trend"],[data-home-card-id="builtin:token-trend"]){grid-column:span 6!important;}
+    }
+    @container toolbox-home (min-width:88rem){
+      ${card}{grid-column:span 3!important;}
+      ${card}[data-home-card-id="builtin:hitokoto"]{grid-column:span 3!important;}
+      ${card}[data-home-card-id="builtin:stats-overview"]{grid-column:span 6!important;}
+      ${grid} [data-home-summary-secondary]{grid-template-columns:repeat(4,minmax(0,1fr))!important;}
+    }
+  `;
+}
+
 // Shared, DOM-free contract used by the editor and the Dashboard adapter.
 
 const FONTS = {
@@ -142,7 +195,8 @@ function themeCSS(input, root = 'html[data-plugin-appearance]') {
     @media(prefers-reduced-transparency:reduce){${root} [data-dashboard-sidebar],${root} [data-dashboard-header]{background:${t.surface}!important;backdrop-filter:none;}}
     ${region('[data-dashboard-sidebar]', t.regions.sidebar)}
     ${region('[data-dashboard-header]', t.regions.header)}
-    ${region(cards, t.regions.card)}`;
+    ${region(cards, t.regions.card)}
+    ${homeLayoutCSS(root, t.gap)}`;
 }
 
 // Executed in the Dashboard document; consumes only validated, public appearance data.

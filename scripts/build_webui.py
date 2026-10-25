@@ -31,6 +31,7 @@ def build(check: bool = False) -> None:
     )
     scripts = [data_js]
     for name in [
+        "shared/dashboard-home.js",
         "shared/theme-contract.js",
         "shared/bridge.js",
         "shared/confirm.js",
@@ -116,6 +117,7 @@ def build(check: bool = False) -> None:
     }
     runtime_sources = [
         data_js,
+        (source / "shared/dashboard-home.js").read_text(encoding="utf-8"),
         (source / "shared/theme-contract.js").read_text(encoding="utf-8"),
         (source / "features/appearance/runtime.js").read_text(encoding="utf-8"),
     ]
