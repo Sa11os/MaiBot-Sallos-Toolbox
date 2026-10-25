@@ -2,10 +2,10 @@
 
 import json
 import subprocess
+import tempfile
 from pathlib import Path
 from urllib.error import HTTPError
 from urllib.parse import quote
-from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
 REPO = "Sa11os/MaiBot-Sallos-Toolbox"
@@ -29,15 +29,42 @@ def publish():
         raise RuntimeError("GitHub 凭据尚未配置")
 
     def request(url, method="GET", data=None, content_type="application/json"):
-        headers = {
-            "Authorization": f"Bearer {token}",
-            "Accept": "application/vnd.github+json",
-            "X-GitHub-Api-Version": "2022-11-28",
-            "Content-Type": content_type,
-        }
+        # 凭据经 stdin 传入 curl 配置，保持进程参数与临时文件中只有公开发布数据。
+        config = "\n".join(
+            [
+                f'header = "Authorization: Bearer {token}"',
+                'header = "Accept: application/vnd.github+json"',
+                'header = "X-GitHub-Api-Version: 2022-11-28"',
+                f'header = "Content-Type: {content_type}"',
+            ]
+        )
         payload = json.dumps(data).encode() if isinstance(data, dict) else data
-        with urlopen(Request(url, data=payload, headers=headers, method=method), timeout=60) as response:
-            return json.load(response)
+        with tempfile.TemporaryDirectory() as temporary:
+            command = [
+                "curl",
+                "--config",
+                "-",
+                "--silent",
+                "--show-error",
+                "--connect-timeout",
+                "15",
+                "--max-time",
+                "60",
+                "--request",
+                method,
+                "--write-out",
+                "\n%{http_code}",
+                url,
+            ]
+            if payload is not None:
+                body_file = Path(temporary) / "body"
+                body_file.write_bytes(payload)
+                command += ["--data-binary", f"@{body_file}"]
+            result = subprocess.run(command, input=config.encode(), capture_output=True, check=True)
+        body, status = result.stdout.rsplit(b"\n", 1)
+        if int(status) >= 400:
+            raise HTTPError(url, int(status), "GitHub API request failed", None, None)
+        return json.loads(body)
 
     api = f"https://api.github.com/repos/{REPO}"
     try:
