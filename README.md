@@ -1,85 +1,87 @@
-# MaiBot Sallos Toolbox
+# Sallos 工具箱 · MaiBot 插件
 
-Sallos 的 MaiBot 工具箱插件，初始版本为 `0.1.0`。
+让麦麦，更像你的工作台。**0.2.0** 提供全站外观与布局定制，并以独立功能模块承载后续扩展。
 
-[GitHub 仓库](https://github.com/Sa11os/MaiBot-Sallos-Toolbox) · [问题反馈](https://github.com/Sa11os/MaiBot-Sallos-Toolbox/issues) · [MIT 许可证](LICENSE)
+[下载插件 ZIP](https://github.com/Sa11os/MaiBot-Sallos-Toolbox/releases) · [问题反馈](https://github.com/Sa11os/MaiBot-Sallos-Toolbox/issues) · [MIT](LICENSE)
 
-当前提供 `/sallos ping` 命令，用于验证插件加载、配置读取与消息发送链路。后续功能可以继续添加到 `SallosToolboxPlugin`。
+## 安装
 
-## 开发基线
+1. 下载 Release 中的 `MaiBot-Sallos-Toolbox-0.2.0.zip`。
+2. 在 MaiBot 插件管理页上传 ZIP，按宿主提示重启麦麦并启用插件。
+3. 刷新整个 Dashboard，进入顶部「Sallos 工具箱」→「外观」。
+4. 选择模板、调整布局，点击「应用到 Dashboard」并确认。约 2 秒同步到此服务器的浏览器。
 
-- Python 3.12 或更新版本。
-- MaiBot 当前 SDK 架构，初始化对照官方主分支 `1.3.15`。
-- 本地开发使用 `maibot-plugin-sdk==2.16.0`。
-- Manifest v2，插件 ID 为 `sallos.toolbox`。
+**当前适配 Dashboard 1.9.9，开发基线为 MaiBot 1.3.15、SDK 2.16.0、Python 3.12。**
+启用时自动检测版本与目录写入权限。目录只读或版本超出适配范围时，工作台显示原因，预设编辑与保存继续可用。
+NAS 上的实际版本、权限及反向代理环境请按提示核对。
 
-版本基线核对日期：2026-10-25。Manifest 的版本区间表达加载策略；实际部署版本请通过宿主联调确认。
+官方当前 ZIP 安装入口要求先卸载同 ID 的旧插件，再上传新 ZIP。更新前备份插件数据，按管理页提示重启。
+详细兼容与恢复说明见 [compatibility.md](docs/compatibility.md)。
 
-## 目录
+## 功能
+
+- Sallos 工作台、纸上书房、午夜终端三套内置风格。
+- 全站侧栏左右位置与展开宽度、顶栏高度、内容宽度与留白。
+- 六项配色、系统/宋体/等宽字体、字号、行高、圆角与阴影。
+- 侧栏、顶栏、卡片的受限 CSS 声明，涵盖静态颜色、尺寸、边框和排版。
+- 实时布局示意、对比度提示、全站 20 秒预览与恢复原外观。
+- 最多 50 个个人预设；原子保存、并发冲突检查、另存与删除。
+- `/sallos ping` 连通检查。
+
+全站应用和预览作用于此服务器的所有 Dashboard 浏览器。个人预设与已应用风格分别保存。
+原有功能与导航结构继续保留。千禧风格沿用图标侧栏，使用完整侧栏时可选择「原版 Dashboard」。
+
+## 接入方式
+
+ZIP 提供标准 `_manifest.json`、`plugin.py` 与 `webui.json`，页面使用官方隔离容器和静态 API。
+启用时，插件额外备份 Dashboard 的 index.html，加入有明确标记的脚本入口，将脚本与公开外观状态写入专属目录。
+停用时撤销入口并发布恢复状态。这属于本插件的兼容层，Dashboard 升级后需要重新检查适配。
+
+多实例共享同一套静态目录时会显示冲突。公开资源仅含当前主题与预览回退主题；个人预设列表及运行配置保留在插件数据目录。
+应急恢复：在地址添加 `?sallosAppearance=off` 暂停当前标签页外观，使用 `?sallosAppearance=on` 恢复。
+也可按 Ctrl+Shift+Backspace 暂停。插件进程意外退出后，浏览器约 30 秒回退。
+
+## 模块结构
 
 ```text
-MaiBot-Sallos-Toolbox/
-├── _manifest.json       # 插件身份、兼容范围、业务依赖与能力声明
-├── plugin.py            # 配置模型、生命周期、命令、工厂函数
-├── pyproject.toml       # 本地代码检查设置
-├── requirements-dev.txt # 本地 SDK 和检查工具
-├── LICENSE              # MIT 开源许可证
-├── README.md
-└── .gitignore           # 排除运行时配置、环境与缓存
+plugin.py                              工厂入口
+sallos_toolbox/app.py                   生命周期与装配
+sallos_toolbox/config.py                分功能配置
+sallos_toolbox/features/health/         连通检查
+sallos_toolbox/features/appearance/     模型、组件、服务、预设仓库
+  integration/                         检测、文件安装、租约与恢复
+web/src/features/appearance/            编辑器、预设、预览与全站脚本
+web/src/shared/                         桥接、确认弹窗、风格校验与编译
+scripts/                               构建、打包与浏览器验证
+tests/                                 模型、并发、SDK 与安装恢复测试
 ```
+
+新增功能遵循 [开发约束](AGENTS.md) 和 [架构说明](docs/architecture.md)。手写 Python/JS/CSS 文件控制在 300 行以内；生成 HTML 与运行脚本通过构建更新。
+视觉参考 SallosWorkbench，结合 Apple Design 和 UI/UX Pro Max 的交互与可访问性原则。
 
 ## 本地开发
 
-在项目目录执行 PowerShell 命令：
-
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
-.\.venv\Scripts\python.exe -m ruff check .
-.\.venv\Scripts\python.exe -m ruff format --check .
-.\.venv\Scripts\python.exe -c "from plugin import create_plugin; p = create_plugin(); print(p.get_components()); print(p.get_default_config())"
+.venv/Scripts/python -m pip install -r requirements-dev.txt
+.venv/Scripts/python scripts/build_webui.py
+.venv/Scripts/python -m unittest discover -s tests -v
+.venv/Scripts/python -m ruff check sallos_toolbox scripts tests plugin.py
+.venv/Scripts/python scripts/package_plugin.py
 ```
 
-最后一条命令验证 SDK 导入、组件声明与默认配置。插件的实际消息收发需要 MaiBot Runner 注入上下文。
+完整集成验证需要在项目旁放置官方 MaiBot 源码，并下载测试用 Dashboard：
 
-## 安装与联调
-
-1. 在 MaiBot 根目录执行 `git clone https://github.com/Sa11os/MaiBot-Sallos-Toolbox.git plugins/MaiBot-Sallos-Toolbox`，让 `_manifest.json` 与 `plugin.py` 位于插件目录根部。
-2. 启动 MaiBot，查看日志中的“Sallos 工具箱已加载”。
-3. Runner 首次加载会在已安装的插件目录生成 `config.toml`。
-4. 在麦麦所在的聊天中发送 `/sallos ping`，预期收到“pong！Sallos 工具箱已就绪喵~”。
-5. 修改 `plugin.ping_reply`，等待配置热重载后再次执行命令，确认回复随配置更新。
-6. 将 `plugin.enabled` 设为 `false`，确认命令停止发送回复；恢复为 `true` 后继续联调。
-
-默认配置由 `ToolboxConfig` 定义，生成内容如下：
-
-```toml
-[plugin]
-config_version = "1.0.0"
-enabled = true
-ping_reply = "pong！Sallos 工具箱已就绪喵~"
+```powershell
+.venv/Scripts/python -m pip install --target .dev/dashboard maibot-dashboard==1.9.9
+.venv/Scripts/python scripts/browser_smoke.py
 ```
 
-## 扩展约定
+浏览器验证默认使用本机 Edge。测试使用真实 Dashboard 前端、插件页面和本地插件服务；宿主认证、插件路由与聊天/系统接口使用本地测试替身。测试全过程保持 NAS 环境原样。
 
-- 用户命令使用 `@Command`，模型工具使用 `@Tool`，流程介入使用 `@HookHandler`。
-- 使用 `self.ctx` 调用宿主能力，在 `_manifest.json.capabilities` 中逐项声明所用能力。
-- Python 业务依赖放在 `_manifest.json.dependencies`，当前业务依赖为空。
-- 保留 `on_load`、`on_unload`、`on_config_update` 与模块级 `create_plugin()`。
-- 配置字段提供默认值，结构变化时更新 `plugin.config_version`。
-- 持久数据使用 `self.ctx.paths.data_dir`，临时文件使用 `self.ctx.paths.runtime_dir`。
+## 参考
 
-## 开源与发布
-
-作者：[Sallos（Sa11os）](https://github.com/Sa11os)。项目采用 [MIT 许可证](LICENSE)开源。
-
-当前版本为插件开发骨架，已完成代码检查和模拟验证。实际消息收发与配置热重载仍待目标 MaiBot 环境联调；完成后可继续提交至官方插件市场。
-
-## 官方资料
-
-- [插件开发指南](https://docs.mai-mai.org/plugin/)
-- [SDK 详细开发指南](https://github.com/Mai-with-u/maibot-plugin-sdk/blob/main/docs/guide.md)
+- [官方插件开发](https://docs.mai-mai.org/plugin/)
+- [WebUI 页面协议](https://docs.mai-mai.org/plugin/webui-pages)
 - [Manifest 规范](https://docs.mai-mai.org/plugin/manifest)
-- [Vibe Coding 开发约定](https://docs.mai-mai.org/plugin/vibe-coding)
-- [官方 MaiBot 依赖与版本](https://github.com/Mai-with-u/MaiBot/blob/main/pyproject.toml)
-- [发布插件](https://docs.mai-mai.org/plugin/submission)
+- [验证记录](docs/verification.md)

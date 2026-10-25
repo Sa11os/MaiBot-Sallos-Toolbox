@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sallos 工具箱 · 外观工作台</title>
+  <style>
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-synthesis: none; font-optical-sizing: auto; color-scheme: light;
+  --page: #f5f5f7; --surface: #fff; --soft: #f5f5f7; --text: #1d1d1f; --muted: #6e6e73;
+  --line: #e8e8ed; --line-strong: #d2d2d7; --accent: #0071e3; --danger: #b42318;
+  --shadow: 0 2px 8px #141a2d06, 0 12px 32px #141a2d06;
+}
+* { box-sizing: border-box; }
+dialog { max-width: min(420px, calc(100vw - 32px)); padding: 28px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+dialog::backdrop { background: #0005; }
+body { margin: 0; background: var(--page); color: var(--text); font-size: 15px; line-height: 1.6; }
+button, input, select, textarea { font: inherit; }
+button { min-height: 44px; padding: 9px 16px; border: 1px solid var(--line-strong); border-radius: 11px;
+  background: var(--surface); color: var(--text); cursor: pointer; font-weight: 500;
+  transition: background 160ms ease, box-shadow 160ms ease, transform 100ms ease; touch-action: manipulation; }
+button:hover:enabled { background: var(--soft); }
+button:active:enabled { transform: scale(.97); }
+button:disabled { opacity: .48; cursor: default; }
+button.primary { background: var(--accent); color: white; border-color: transparent; box-shadow: 0 3px 10px #0071e325; }
+button.primary:hover:enabled { background: #0064ca; }
+button.quiet, button.danger-text { border-color: transparent; background: transparent; }
+button.quiet { color: var(--accent); }
+#refresh { white-space: nowrap; flex-shrink: 0; }
+button.danger-text { color: var(--danger); }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+h1, h2, h3, h4, p { margin: 0; }
+h1 { font-size: clamp(26px, 2.7vw, 38px); line-height: 1.2; letter-spacing: -.035em; font-weight: 700; }
+h2 { font-size: 19px; line-height: 1.4; letter-spacing: -.02em; }
+p { overflow-wrap: anywhere; }
+.studio { max-width: 1550px; margin: auto; padding: 36px clamp(16px, 3.4vw, 52px) 52px; }
+.studio-heading, .section-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.studio-heading { margin-bottom: 30px; }
+.eyebrow { color: var(--muted); font-size: 11px; letter-spacing: .1em; font-weight: 600; margin-bottom: 10px; }
+.subtitle { color: var(--muted); margin-top: 12px; }
+.device-badge { display: flex; gap: 8px; align-items: center; color: var(--muted); white-space: nowrap; font-size: 12px; }
+svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+.panel { min-width: 0; padding: 24px; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--shadow); }
+.section-heading { margin-bottom: 20px; }
+.section-heading p { color: var(--muted); font-size: 13px; margin-top: 4px; }
+.section-heading .eyebrow { margin-top: 0; font-size: 10px; }
+.hint { font-size: 12px; color: var(--muted); line-height: 1.7; margin-top: 12px; }
+.step { font-size: 12px; font-variant-numeric: tabular-nums; color: var(--muted); }
+.field { display: flex; flex-direction: column; gap: 7px; margin-top: 16px; font-size: 13px; font-weight: 500; }
+input[type="text"], select, textarea { width: 100%; min-width: 0; min-height: 44px; padding: 10px 12px;
+  border: 1px solid var(--line-strong); border-radius: 10px; background: var(--soft); color: var(--text); }
+textarea { font: 12px/1.7 Consolas, monospace; resize: vertical; }
+input[type="range"] { width: 100%; height: 28px; margin: 6px 0 0; accent-color: var(--accent); cursor: pointer; }
+small { font-size: 12px; }
+.two-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.action-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.footer-row { display: flex; align-items: center; gap: 10px; justify-content: space-between; margin-top: 18px; border-top: 1px solid var(--line); padding-top: 14px; }
+#status { font-size: 12px; color: var(--muted); }
+#status[data-error="true"], #field-error { color: var(--danger); }
+#field-error { margin: 0 8px; font-size: 13px; }
+@media (max-width: 640px) {
+  .studio { padding: 20px 12px 32px; } .panel { padding: 18px; border-radius: 16px; }
+  .device-badge { display: none; } .studio-heading { margin-bottom: 22px; } .subtitle { font-size: 13px; }
+  .footer-row { flex-wrap: wrap; } input[type="text"], select { font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+@media (prefers-reduced-transparency: reduce) { .preview-sidebar, .preview-header { backdrop-filter: none !important; background: var(--surface) !important; } }
+@media (prefers-contrast: more) { :root { --line: #888; --line-strong: #555; --muted: #444; } }
+.dark { --page: #161618; --surface: #222225; --soft: #2b2b2f; --text: #f5f5f7; --muted: #b0b0b8;
+  --line: #35353a; --line-strong: #515158; --accent: #70b5ff; --danger: #ff8a80; color-scheme: dark; }
+.dark button.primary { background: #0071e3; color: #fff; }
+
+.presets-panel { margin-bottom: 24px; }
+.preset-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.preset { min-width: 0; padding: 10px; text-align: left; border-color: var(--line); border-radius: 14px; }
+.preset[aria-pressed="true"] { outline: 2px solid var(--accent); outline-offset: 1px; }
+.preset strong, .preset small { display: block; padding-inline: 2px; overflow-wrap: anywhere; }
+.preset strong { margin-top: 9px; font-size: 13px; } .preset small { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.preset-sample { height: 56px; display: flex; gap: 5px; align-items: center; padding: 14px; border-radius: 8px; border: 1px solid #0000000a; }
+.preset-sample i { width: 22px; height: 22px; border: 1px solid #00000012; border-radius: 50%; }
+.editor-grid { display: grid; grid-template-columns: minmax(280px, .8fr) minmax(0, 1.35fr); gap: 24px; align-items: start; }
+.controls, .preview-column { display: grid; gap: 20px; min-width: 0; }
+.preview-column { position: sticky; top: 20px; }
+.range-field { display: block; margin-top: 16px; font-size: 13px; }
+.range-field > span { display: flex; align-items: baseline; gap: 5px; }
+.range-field output { margin-left: auto; font-variant-numeric: tabular-nums; color: var(--muted); }
+.range-field small { color: var(--muted); font-size: 10px; }
+.colors { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 10px; }
+.color-field { display: flex; align-items: center; gap: 10px; font-size: 12px; cursor: pointer; }
+.color-field small { display: block; color: var(--muted); font: 10px/1.7 Consolas, monospace; }
+input[type="color"] { appearance: none; border: 1px solid var(--line-strong); background: var(--surface); border-radius: 50%; width: 40px; height: 40px; padding: 3px; cursor: pointer; }
+input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+input[type="color"]::-webkit-color-swatch { border: 0; border-radius: 50%; }
+.advanced { padding-block: 19px; }
+.advanced summary { cursor: pointer; font-size: 14px; font-weight: 600; }
+.advanced summary span { float: right; font-size: 11px; font-weight: 400; color: var(--muted); }
+.live-dot { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; font-size: 11px; color: var(--muted); }
+.live-dot::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #248044; }
+.preview-window { border: 1px solid var(--line-strong); border-radius: 12px; overflow: hidden; min-height: 380px; }
+.preview-chrome { display: flex; gap: 5px; padding: 10px 12px; align-items: center; background: #efeff2; border-bottom: 1px solid #dddde2; color: #6e6e73; }
+.preview-chrome i { width: 7px; height: 7px; border-radius: 50%; background: #c8c8cd; }
+.preview-chrome span { margin-left: 12px; font-size: 10px; }
+.preview-shell { display: flex; min-height: 350px; }
+.preview-sidebar { flex: 0 0 clamp(90px, 24%, var(--preview-sidebar-width)); padding: 16px 10px; border-right: 1px solid #0000000a; }
+.preview-brand { display: flex; align-items: center; gap: 6px; font-size: 12px; margin-bottom: 28px; }
+.preview-brand b { display: grid; place-items: center; background: #0071e3; color: #fff; border-radius: 8px; width: 26px; height: 26px; }
+.preview-sidebar > small { display: block; font-size: 9px; opacity: .65; margin: 16px 5px 8px; }
+.preview-nav { font-size: 10px; padding: 7px; margin-bottom: 4px; border-radius: 7px; }
+.preview-nav.selected { background: #ffffff9c; color: #1d1d1f; box-shadow: 0 1px 6px #00000005; }
+.preview-body { min-width: 0; flex: 1; }
+.preview-header { display: flex; align-items: center; gap: 10px; padding-inline: 16px; font-size: 10px; }
+.preview-header span { opacity: .5; }
+.preview-kicker { font-size: 9px; opacity: .65; margin-top: 5px; }
+.preview-main h3 { font-size: 19px; letter-spacing: -.03em; margin-top: 8px; }
+.preview-main > p { font-size: 10px; opacity: .7; margin-top: 5px; }
+.preview-feature { margin: 18px 0 12px; padding: 18px; }
+.preview-feature > span { font-size: 9px; }
+.preview-feature h4 { font-size: 14px; line-height: 1.5; margin: 9px 0 12px; }
+.preview-button { display: inline-flex; align-items: center; gap: 10px; padding: 7px 9px; border-radius: 7px; background: hsl(var(--color-primary)); color: hsl(var(--color-primary-foreground)); }
+.preview-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.preview-cards article { padding: 14px; min-width: 0; }
+.preview-cards small { font-size: 9px; opacity: .7; }
+.preview-cards strong { display: block; font-size: 15px; margin-top: 5px; }
+.preview-note { display: block; font-size: 9px; opacity: .6; margin-top: 10px; }
+#preview[data-side="right"] .preview-sidebar { order: 2; border-right: 0; border-left: 1px solid #0000000a; }
+#contrast[data-warning="true"] { color: #a05b00; }
+.apply-panel > h2 { font-size: 18px; }
+@media (max-width: 1050px) { .editor-grid { grid-template-columns: minmax(260px, 1fr) minmax(0, 1.2fr); gap: 16px; } .panel { padding: 20px; } .preview-sidebar { flex-basis: 90px; } .preview-main h3 { font-size: 16px; } }
+@media (max-width: 760px) { .editor-grid { grid-template-columns: 1fr; } .preview-column { position: static; grid-row: 1; } .preview-sidebar { flex-basis: 24%; } .preview-panel { padding: 16px; } .preview-window { min-height: 330px; } .preview-shell { min-height: 300px; } .preset-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; } .preset-sample { padding: 8px; } .preview-feature { padding: 14px; } .preview-cards article { padding: 10px; } }
+@media (max-width: 400px) { .preset-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } .action-row button { flex: 1 1 auto; } .preview-brand strong { font-size: 10px; } .preview-nav { font-size: 9px; } }
+
+</style>
+  <style id="preview-styles"></style>
+</head>
+<body>
+  <main class="studio">
+    <header class="studio-heading">
+      <div><p class="eyebrow">SALLOS TOOLBOX / APPEARANCE</p><h1>让麦麦，更像你的工作台。</h1><p class="subtitle">从一套熟悉的风格开始，把布局与每个细节调到刚刚好。</p></div>
+      <span class="device-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>外观工作台</span>
+    </header>
+
+    <section class="panel presets-panel" aria-labelledby="presets-title">
+      <div class="section-heading"><div><h2 id="presets-title">从喜欢的风格开始</h2><p>内置模板与个人预设，一处管理。</p></div><button type="button" id="refresh" class="quiet">刷新列表</button></div>
+      <div id="preset-list" class="preset-list"></div>
+    </section>
+
+    <div class="editor-grid">
+      <form id="editor" class="controls" aria-label="外观编辑器">
+        <section class="panel">
+          <div class="section-heading"><div><h2>基本设置</h2><p>为这套风格起个名字。</p></div><span class="step">01</span></div>
+          <label class="field">风格名称<input name="name" type="text" maxlength="40" required autocomplete="off"></label>
+          <div class="two-columns"><label class="field">显示模式<select name="mode"><option value="light">日间</option><option value="dark">夜间</option><option value="system">跟随系统</option></select></label><label class="field">字体<select name="font"><option value="system">系统字体</option><option value="serif">宋体 / 衬线</option><option value="mono">等宽字体</option></select></label></div>
+          <p class="hint">显示模式控制界面明暗与原生控件，下面的自定义配色保持你的选择。</p>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading"><div><h2>布局与留白</h2><p>调整空间，让常用内容更顺手。</p></div><span class="step">02</span></div>
+          <label class="field">侧栏位置<select name="sidebar_side"><option value="left">左侧</option><option value="right">右侧</option></select></label>
+          <label class="range-field"><span>侧栏宽度 <output data-value="sidebar_width"></output><small>px</small></span><input type="range" name="sidebar_width" min="160" max="360" step="4"></label>
+          <label class="range-field"><span>顶栏高度 <output data-value="header_height"></output><small>px</small></span><input type="range" name="header_height" min="48" max="96" step="2"></label>
+          <label class="range-field"><span>内容最大宽度 <output data-value="content_width"></output><small>px</small></span><input type="range" name="content_width" min="720" max="2560" step="8"></label>
+          <label class="range-field"><span>内容留白 <output data-value="gap"></output><small>px</small></span><input type="range" name="gap" min="8" max="40"></label>
+          <p class="hint">宽度用于桌面展开侧栏；千禧风格沿用图标栏。选择原版 Dashboard 可使用完整侧栏，窄屏沿用移动导航。</p>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading"><div><h2>配色与质感</h2><p>清晰的对比，克制的层次。</p></div><span class="step">03</span></div>
+          <div class="colors">
+            <label class="color-field"><input type="color" name="primary"><span>强调色<small data-value="primary"></small></span></label>
+            <label class="color-field"><input type="color" name="background"><span>页面背景<small data-value="background"></small></span></label>
+            <label class="color-field"><input type="color" name="surface"><span>面板背景<small data-value="surface"></small></span></label>
+            <label class="color-field"><input type="color" name="text"><span>主要文字<small data-value="text"></small></span></label>
+            <label class="color-field"><input type="color" name="muted"><span>次要文字<small data-value="muted"></small></span></label>
+            <label class="color-field"><input type="color" name="border"><span>边框<small data-value="border"></small></span></label>
+          </div>
+          <label class="range-field"><span>圆角 <output data-value="radius"></output><small>px</small></span><input type="range" name="radius" min="0" max="24"></label>
+          <label class="field">阴影<select name="shadow"><option value="soft">轻柔悬浮</option><option value="none">平面简洁</option><option value="crisp">清晰投影</option></select></label>
+        </section>
+
+        <details class="panel advanced"><summary>字体细节<span>字号与行距</span></summary><div>
+          <label class="range-field"><span>正文字号 <output data-value="font_size"></output><small>px</small></span><input type="range" name="font_size" min="14" max="22"></label>
+          <label class="range-field"><span>行距 <output data-value="line_height"></output></span><input type="range" name="line_height" min="1.2" max="2" step="0.1"></label>
+        </div></details>
+
+        <details class="panel advanced"><summary>分区样式<span>进阶微调</span></summary><div>
+          <p class="hint">填写 CSS 声明，如 <code>border-radius: 16px; padding: 20px;</code>。支持颜色、边框、内外边距、字体和阴影。</p>
+          <label class="field">侧栏<textarea name="region_sidebar" rows="3" maxlength="2000" spellcheck="false" placeholder="border: 1px solid #D2D2D7;"></textarea></label>
+          <label class="field">顶栏<textarea name="region_header" rows="3" maxlength="2000" spellcheck="false" placeholder="background-color: #ffffff;"></textarea></label>
+          <label class="field">卡片<textarea name="region_card" rows="3" maxlength="2000" spellcheck="false" placeholder="border-radius: 20px;"></textarea></label>
+        </div></details>
+        <p id="field-error" role="alert"></p>
+      </form>
+
+      <aside class="preview-column" aria-label="外观实时预览">
+        <section class="panel preview-panel">
+          <div class="section-heading"><div><p class="eyebrow">LIVE PREVIEW</p><h2>边调整，边感受。</h2></div><span class="live-dot">实时预览</span></div>
+          <div id="preview" class="preview-window">
+            <div class="preview-chrome"><i></i><i></i><i></i><span>MaiBot · 布局示意</span></div>
+            <div class="preview-shell">
+              <aside class="preview-sidebar" data-dashboard-sidebar><div class="preview-brand"><b>S</b><strong>Sallos</strong></div><small>工作空间</small><div class="preview-nav selected">概览</div><div class="preview-nav">麦麦聊天</div><div class="preview-nav">学习与记忆</div><small>工具箱</small><div class="preview-nav">外观工作台</div></aside>
+              <div class="preview-body"><header class="preview-header" data-dashboard-header>工作台 <span>›</span> 概览</header><div class="preview-main" data-dashboard-main><p class="preview-kicker">属于你的空间</p><h3 class="preview-name">Sallos 工作台</h3><p>整理界面，专注当下。</p><article class="bg-card preview-feature"><span>今日灵感</span><h4>让每一次交流，都舒适自然。</h4><span class="preview-button">开始聊天 <span aria-hidden="true">↗</span></span></article><div class="preview-cards"><article class="bg-card"><small>连接状态</small><strong>就绪</strong><span class="preview-note">布局示意</span></article><article class="bg-card"><small>我的工具</small><strong>灵活组合</strong><span class="preview-note">按你的习惯</span></article></div></div></div>
+            </div>
+          </div>
+          <p id="contrast" class="hint"></p>
+          <p class="hint">这里展示布局示意；“全站预览”可查看真实页面效果。</p>
+        </section>
+
+        <section class="panel apply-panel" id="actions" aria-label="保存与应用">
+          <h2>把喜欢的样子留下。</h2>
+          <p id="integration-note" class="hint">正在连接工作台…</p>
+          <div class="action-row"><button id="apply" class="primary" type="button">应用到 Dashboard</button><button id="preview-site" type="button">全站预览 20 秒</button></div>
+          <div class="action-row"><button id="save" type="button">保存预设</button><button id="save-copy" type="button">另存一份</button><button id="restore" class="quiet" type="button">恢复原外观</button></div>
+          <div class="footer-row"><p id="status" role="status" aria-live="polite">准备中</p><button id="delete" class="danger-text" type="button" disabled>删除预设</button></div>
+        </section>
+      </aside>
+    </div>
+  </main>
+  <dialog id="discard-dialog" aria-labelledby="discard-title">
+    <h2 id="discard-title">切换到另一套风格？</h2>
+    <p class="hint">当前编辑尚未保存，切换后将载入所选预设。</p>
+    <div class="action-row"><button type="button" autofocus onclick="this.closest('dialog').close('cancel')">继续编辑</button><button type="button" onclick="this.closest('dialog').close('discard')">切换风格</button></div>
+  </dialog>
+  <script type="module">
+// Generated by scripts/build_webui.py.
+const DEFAULT_THEME = {"version": 1, "name": "我的风格", "mode": "light", "primary": "#0071E3", "background": "#F5F5F7", "surface": "#FFFFFF", "text": "#1D1D1F", "muted": "#6E6E73", "border": "#D2D2D7", "sidebar_side": "left", "sidebar_width": 224, "header_height": 56, "content_width": 1440, "gap": 20, "font": "system", "font_size": 16, "line_height": 1.6, "radius": 16, "shadow": "soft", "regions": {"sidebar": "", "header": "", "card": ""}};
+const THEME_SCHEMA = {"$defs": {"RegionStyles": {"additionalProperties": false, "properties": {"sidebar": {"default": "", "maxLength": 2000, "title": "Sidebar", "type": "string"}, "header": {"default": "", "maxLength": 2000, "title": "Header", "type": "string"}, "card": {"default": "", "maxLength": 2000, "title": "Card", "type": "string"}}, "title": "RegionStyles", "type": "object"}}, "additionalProperties": false, "properties": {"version": {"const": 1, "default": 1, "title": "Version", "type": "integer"}, "name": {"default": "我的风格", "maxLength": 40, "minLength": 1, "title": "Name", "type": "string"}, "mode": {"default": "light", "enum": ["light", "dark", "system"], "title": "Mode", "type": "string"}, "primary": {"default": "#0071E3", "pattern": "^#[0-9a-fA-F]{6}$", "title": "Primary", "type": "string"}, "background": {"default": "#F5F5F7", "pattern": "^#[0-9a-fA-F]{6}$", "title": "Background", "type": "string"}, "surface": {"default": "#FFFFFF", "pattern": "^#[0-9a-fA-F]{6}$", "title": "Surface", "type": "string"}, "text": {"default": "#1D1D1F", "pattern": "^#[0-9a-fA-F]{6}$", "title": "Text", "type": "string"}, "muted": {"default": "#6E6E73", "pattern": "^#[0-9a-fA-F]{6}$", "title": "Muted", "type": "string"}, "border": {"default": "#D2D2D7", "pattern": "^#[0-9a-fA-F]{6}$", "title": "Border", "type": "string"}, "sidebar_side": {"default": "left", "enum": ["left", "right"], "title": "Sidebar Side", "type": "string"}, "sidebar_width": {"default": 224, "maximum": 360, "minimum": 160, "title": "Sidebar Width", "type": "integer"}, "header_height": {"default": 56, "maximum": 96, "minimum": 48, "title": "Header Height", "type": "integer"}, "content_width": {"default": 1440, "maximum": 2560, "minimum": 720, "title": "Content Width", "type": "integer"}, "gap": {"default": 20, "maximum": 40, "minimum": 8, "title": "Gap", "type": "integer"}, "font": {"default": "system", "enum": ["system", "serif", "mono"], "title": "Font", "type": "string"}, "font_size": {"default": 16, "maximum": 22, "minimum": 14, "title": "Font Size", "type": "integer"}, "line_height": {"default": 1.6, "maximum": 2.0, "minimum": 1.2, "title": "Line Height", "type": "number"}, "radius": {"default": 16, "maximum": 24, "minimum": 0, "title": "Radius", "type": "integer"}, "shadow": {"default": "soft", "enum": ["none", "soft", "crisp"], "title": "Shadow", "type": "string"}, "regions": {"$ref": "#/$defs/RegionStyles"}}, "title": "AppearanceTheme", "type": "object"};
+const BUILTIN_PRESETS = [{"id": "workbench", "theme": {"version": 1, "name": "Sallos 工作台", "mode": "light", "primary": "#0071E3", "background": "#F5F5F7", "surface": "#FFFFFF", "text": "#1D1D1F", "muted": "#6E6E73", "border": "#D2D2D7", "sidebar_side": "left", "sidebar_width": 224, "header_height": 56, "content_width": 1440, "gap": 20, "font": "system", "font_size": 16, "line_height": 1.6, "radius": 16, "shadow": "soft", "regions": {"sidebar": "", "header": "", "card": ""}}}, {"id": "paper", "theme": {"version": 1, "name": "纸上书房", "mode": "light", "primary": "#975335", "background": "#F4EFE6", "surface": "#FFFDF8", "text": "#352C23", "muted": "#716251", "border": "#D7C8B4", "sidebar_side": "left", "sidebar_width": 224, "header_height": 56, "content_width": 1440, "gap": 20, "font": "serif", "font_size": 16, "line_height": 1.6, "radius": 4, "shadow": "crisp", "regions": {"sidebar": "", "header": "", "card": ""}}}, {"id": "night", "theme": {"version": 1, "name": "午夜终端", "mode": "dark", "primary": "#8ECCA6", "background": "#151D24", "surface": "#202B35", "text": "#E5EBEF", "muted": "#A6B6C4", "border": "#4A5D6A", "sidebar_side": "left", "sidebar_width": 224, "header_height": 56, "content_width": 1440, "gap": 20, "font": "mono", "font_size": 16, "line_height": 1.6, "radius": 6, "shadow": "none", "regions": {"sidebar": "", "header": "", "card": ""}}}];
+const REGION_PROPERTIES = ["background-color", "border", "border-color", "border-radius", "border-style", "border-width", "box-shadow", "color", "font-size", "font-weight", "letter-spacing", "line-height", "margin", "padding", "padding-block", "padding-inline", "text-transform"];
+
+// Shared, DOM-free contract used by the editor and the Dashboard adapter.
+
+const FONTS = {
+  system: '"Segoe UI", "Microsoft YaHei UI", system-ui, sans-serif',
+  serif: '"Noto Serif SC", "Songti SC", SimSun, Georgia, serif',
+  mono: '"Cascadia Code", Consolas, "Microsoft YaHei UI", monospace',
+};
+
+function validateDeclarations(value) {
+  if (typeof value !== 'string' || value.length > 2000) throw new Error('分区 CSS 超过长度限制');
+  for (const item of value.split(';').filter(part => part.trim())) {
+    const colon = item.indexOf(':');
+    const property = item.slice(0, colon).trim();
+    const content = item.slice(colon + 1);
+    if (colon < 0 || !REGION_PROPERTIES.includes(property)) throw new Error('分区 CSS 包含未支持的属性');
+    if (!/^[\w\s#.,()%+\-]+$/.test(content)) throw new Error('分区 CSS 请使用静态颜色、尺寸与阴影值');
+    for (const match of content.matchAll(/([\w-]+)\s*\(/g)) {
+      if (!['rgb', 'rgba', 'hsl', 'hsla'].includes(match[1].toLowerCase())) {
+        throw new Error('分区 CSS 支持 rgb/rgba/hsl/hsla 颜色函数');
+      }
+    }
+  }
+  return value.trim();
+}
+
+function validateTheme(input) {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) throw new Error('请提供风格对象');
+  for (const key of Object.keys(input)) {
+    if (!Object.hasOwn(DEFAULT_THEME, key)) throw new Error(`未知风格字段：${key}`);
+  }
+  const value = { ...structuredClone(DEFAULT_THEME), ...input };
+  for (const [key, rule] of Object.entries(THEME_SCHEMA.properties)) {
+    if (key === 'regions') continue;
+    const item = value[key];
+    if (rule.const !== undefined && item !== rule.const) throw new Error('风格版本需要升级');
+    if (rule.enum && !rule.enum.includes(item)) throw new Error(`请选择有效的 ${key}`);
+    if (rule.type === 'string' && (typeof item !== 'string' || !item.trim()
+      || (rule.maxLength && item.length > rule.maxLength)
+      || (rule.pattern && !new RegExp(rule.pattern).test(item)))) throw new Error(`请检查 ${key}`);
+    if (['integer', 'number'].includes(rule.type) && (typeof item !== 'number'
+      || !Number.isFinite(item) || (rule.type === 'integer' && !Number.isInteger(item))
+      || item < rule.minimum || item > rule.maximum)) throw new Error(`请检查 ${key} 的范围`);
+  }
+  if (!value.regions || typeof value.regions !== 'object' || Array.isArray(value.regions)) {
+    throw new Error('请提供分区样式对象');
+  }
+  for (const key of Object.keys(value.regions)) {
+    if (!['sidebar', 'header', 'card'].includes(key)) throw new Error('未知样式分区');
+  }
+  value.regions = Object.fromEntries(['sidebar', 'header', 'card'].map(key =>
+    [key, validateDeclarations(value.regions[key] ?? '')]));
+  value.name = value.name.trim();
+  return value;
+}
+
+function luminance(hex) {
+  const rgb = hex.match(/[0-9a-f]{2}/gi).map(part => parseInt(part, 16) / 255)
+    .map(v => v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+  return rgb[0] * 0.2126 + rgb[1] * 0.7152 + rgb[2] * 0.0722;
+}
+
+function contrast(first, second) {
+  const a = luminance(first), b = luminance(second);
+  return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+}
+
+function hsl(hex) {
+  const [r, g, b] = hex.match(/[0-9a-f]{2}/gi).map(part => parseInt(part, 16) / 255);
+  const high = Math.max(r, g, b), low = Math.min(r, g, b), delta = high - low;
+  const light = (high + low) / 2;
+  const saturation = delta === 0 ? 0 : delta / (1 - Math.abs(2 * light - 1));
+  let hue = 0;
+  if (delta) hue = high === r ? ((g - b) / delta) % 6 : high === g ? (b - r) / delta + 2 : (r - g) / delta + 4;
+  return `${((hue * 60 + 360) % 360).toFixed(2)} ${(saturation * 100).toFixed(2)}% ${(light * 100).toFixed(2)}%`;
+}
+
+function themeCSS(input, root = 'html[data-plugin-appearance]') {
+  const t = validateTheme(input);
+  const foreground = contrast(t.primary, '#FFFFFF') >= contrast(t.primary, '#000000') ? '#FFFFFF' : '#000000';
+  const shadow = { none: 'none', soft: '0 4px 20px #0000000d', crisp: `3px 3px 0 ${t.border}` }[t.shadow];
+  const tokens = {
+    primary: t.primary, 'primary-foreground': foreground, accent: t.primary, 'accent-foreground': foreground,
+    background: t.background, foreground: t.text, card: t.surface, 'card-foreground': t.text,
+    popover: t.surface, 'popover-foreground': t.text, muted: t.background, 'muted-foreground': t.muted,
+    secondary: t.background, 'secondary-foreground': t.text, border: t.border, input: t.border, ring: t.primary,
+  };
+  const variables = Object.entries(tokens).map(([key, value]) => `--color-${key}:${hsl(value)}!important;`).join('');
+  const sizes = { xs: 0.75, sm: 0.875, base: 1, lg: 1.125, xl: 1.25, '2xl': 1.5 };
+  const typography = Object.entries(sizes).map(([key, scale]) => `--typography-font-size-${key}:${t.font_size * scale}px!important;`).join('');
+  const region = (selector, declarations) => declarations ? `${root} ${selector}{${declarations.split(';').filter(s => s.trim()).map(s => `${s}!important;`).join('')}}` : '';
+  return `${root}{${variables}${typography}
+    --typography-font-family-base:${FONTS[t.font]}!important;--typography-line-height-normal:${t.line_height}!important;
+    --layout-sidebar-width:${t.sidebar_width}px!important;--layout-header-height:${t.header_height}px!important;
+    --visual-radius-sm:${Math.max(0, t.radius - 4)}px!important;
+    --visual-radius-md:${Math.max(0, t.radius - 2)}px!important;--visual-radius-lg:${t.radius}px!important;
+    --visual-radius-xl:${t.radius + 4}px!important;--visual-shadow-sm:${shadow}!important;--visual-shadow-md:${shadow}!important;
+    font-family:${FONTS[t.font]};font-size:${t.font_size}px;line-height:${t.line_height};
+    background:${t.background};color:${t.text};color-scheme:${t.mode === 'system' ? 'light dark' : t.mode};}
+    ${root} [data-dashboard-sidebar]{background:color-mix(in srgb, ${t.background} 85%, transparent)!important;color:${t.text}!important;backdrop-filter:blur(20px);}
+    ${root} [data-dashboard-header]{background:color-mix(in srgb, ${t.surface} 88%, transparent)!important;color:${t.text}!important;backdrop-filter:blur(20px);}
+    ${root} [data-dashboard-main]{background:${t.background}!important;color:${t.text}!important;}
+    ${root} .bg-card{background:${t.surface}!important;color:${t.text}!important;border-color:${t.border}!important;
+      border-radius:${t.radius}px!important;box-shadow:${shadow}!important;}
+    @media(min-width:1024px){
+      ${root} [data-dashboard-sidebar-layout]{order:${t.sidebar_side === 'right' ? 2 : 0};}
+      ${root} [data-dashboard-header]:not([data-dashboard-header-collapsed="true"]){height:${t.header_height}px!important;min-height:${t.header_height}px!important;}
+      ${root} [data-dashboard-header]{margin-left:0!important;width:100%!important;}
+      ${root} [data-dashboard-workspace-content]{max-width:${t.content_width}px;margin-inline:auto;padding:${t.gap}px;box-sizing:border-box;}
+      ${t.sidebar_side === 'right' ? `${root} [data-dashboard-sidebar]{left:auto;right:0;border-left:1px solid ${t.border};border-right:0;}
+      ${root} [data-dashboard-sidebar][data-dashboard-sidebar-mode="hover"]{position:absolute;}
+      ${root} [data-dashboard-sidebar][data-dashboard-sidebar-mode="hover"][data-dashboard-sidebar-visually-open="false"]{left:0;right:auto;}` : ''}
+    }
+    @media(prefers-reduced-transparency:reduce){${root} [data-dashboard-sidebar],${root} [data-dashboard-header]{background:${t.surface}!important;backdrop-filter:none;}}
+    ${region('[data-dashboard-sidebar]', t.regions.sidebar)}
+    ${region('[data-dashboard-header]', t.regions.header)}
+    ${region('.bg-card', t.regions.card)}`;
+}
+
+function bridge() {
+  if (!window.maibot) throw new Error('请从 MaiBot 的 Sallos 工具箱入口打开工作台');
+  return window.maibot;
+}
+
+async function appearanceAction(name, theme) {
+  const api = bridge();
+  return api.action(name, theme ? { theme } : {});
+}
+
+function showStatus(message, error = false) {
+  const status = document.querySelector('#status');
+  status.textContent = message;
+  status.dataset.error = String(error);
+}
+
+function confirmDiscard() {
+  const dialog = document.querySelector('#discard-dialog');
+  dialog.showModal();
+  return new Promise(resolve => {
+    dialog.addEventListener('close', () => resolve(dialog.returnValue === 'discard'), { once: true });
+  });
+}
+
+
+function renderPreview(theme) {
+  document.querySelector('#preview-styles').textContent = themeCSS(theme, '#preview');
+  const root = document.querySelector('#preview');
+  root.style.setProperty('--preview-sidebar-width', `${Math.round(theme.sidebar_width / 1.5)}px`);
+  root.dataset.side = theme.sidebar_side;
+  root.querySelector('.preview-header').style.height = `${theme.header_height}px`;
+  root.querySelector('.preview-main').style.padding = `${theme.gap}px`;
+  root.querySelector('.preview-name').textContent = theme.name;
+  const pairs = [[theme.text, theme.background], [theme.text, theme.surface], [theme.muted, theme.surface]];
+  const ratio = Math.min(...pairs.map(([a, b]) => contrast(a, b)));
+  document.querySelector('#contrast').textContent = `最低文字对比度 ${ratio.toFixed(1)}:1${ratio < 4.5 ? ' · 建议调整至 4.5:1 以上' : ' · 清晰可读'}`;
+  document.querySelector('#contrast').dataset.warning = String(ratio < 4.5);
+}
+
+
+function fillEditor(theme) {
+  for (const [key, value] of Object.entries(theme)) {
+    if (key === 'regions' || key === 'version') continue;
+    const control = document.querySelector(`[name="${key}"]`);
+    if (control) control.value = value;
+    const echo = document.querySelector(`[data-value="${key}"]`);
+    if (echo) echo.textContent = value;
+  }
+  for (const [key, value] of Object.entries(theme.regions)) {
+    document.querySelector(`[name="region_${key}"]`).value = value;
+  }
+  syncOutputs();
+}
+
+function syncOutputs() {
+  document.querySelectorAll('input[type="range"]').forEach(input => {
+    document.querySelector(`[data-value="${input.name}"]`).textContent = input.value;
+  });
+  document.querySelectorAll('input[type="color"]').forEach(input => {
+    document.querySelector(`[data-value="${input.name}"]`).textContent = input.value.toUpperCase();
+  });
+}
+
+function readEditor() {
+  const values = new FormData(document.querySelector('#editor'));
+  const theme = structuredClone(DEFAULT_THEME);
+  for (const key of Object.keys(theme)) {
+    if (key === 'regions' || key === 'version') continue;
+    theme[key] = typeof theme[key] === 'number' ? Number(values.get(key)) : values.get(key);
+  }
+  for (const key of Object.keys(theme.regions)) theme.regions[key] = values.get(`region_${key}`);
+  return validateTheme(theme);
+}
+
+function renderPresetList(catalog, active, onSelect) {
+  const container = document.querySelector('#preset-list');
+  container.replaceChildren();
+  for (const [presets, builtin] of [[catalog.builtin, true], [catalog.presets, false]]) {
+    for (const preset of presets) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'preset';
+      button.setAttribute('aria-pressed', String(preset.id === active));
+      const sample = document.createElement('span');
+      sample.className = 'preset-sample';
+      sample.style.background = preset.theme.background;
+      for (const key of ['primary', 'surface', 'text']) {
+        const dot = document.createElement('i');
+        dot.style.background = preset.theme[key];
+        sample.append(dot);
+      }
+      const name = document.createElement('strong');
+      name.textContent = preset.theme.name;
+      const label = document.createElement('small');
+      label.textContent = builtin ? '内置模板' : '个人预设';
+      button.append(sample, name, label);
+      button.addEventListener('click', () => onSelect(preset, builtin));
+      container.append(button);
+    }
+  }
+}
+
+
+let catalog = { builtin: BUILTIN_PRESETS, presets: [], revision: 0 };
+let activeId = 'workbench';
+let savedId = '';
+let busy = false;
+let dirty = false;
+let connected = false;
+let previewGeneration = 0;
+
+function renderPresets() {
+  renderPresetList(catalog, activeId, async (preset, builtin) => {
+    if (busy || (dirty && !await confirmDiscard())) return;
+    activeId = preset.id;
+    savedId = builtin ? '' : preset.id;
+    dirty = false;
+    fillEditor(preset.theme);
+    updatePreview();
+    renderPresets();
+    document.querySelector('#delete').disabled = builtin || !connected;
+  });
+}
+
+function updatePreview() {
+  syncOutputs();
+  try {
+    renderPreview(readEditor());
+    document.querySelector('#field-error').textContent = '';
+  } catch (error) { document.querySelector('#field-error').textContent = error.message; }
+}
+
+async function run(operation) {
+  if (busy) return;
+  busy = true;
+  document.querySelector('#editor').inert = true;
+  document.querySelector('#preset-list').inert = true;
+  document.querySelector('#refresh').disabled = true;
+  document.querySelector('#actions').setAttribute('aria-busy', 'true');
+  document.querySelectorAll('#actions button').forEach(button => { button.disabled = true; });
+  try { await operation(); }
+  catch (error) { showStatus(error.message, true); }
+  finally {
+    busy = false;
+    document.querySelector('#editor').inert = false;
+    document.querySelector('#preset-list').inert = false;
+    document.querySelector('#refresh').disabled = false;
+    document.querySelector('#actions').setAttribute('aria-busy', 'false');
+    document.querySelectorAll('#actions button').forEach(button => { button.disabled = !connected; });
+    document.querySelector('#delete').disabled = !savedId || !connected;
+    for (const id of ['apply', 'preview-site', 'restore']) {
+      document.querySelector(`#${id}`).disabled = !catalog.integration?.available;
+    }
+  }
+}
+
+async function refresh() {
+  const result = await bridge().query('catalog');
+  catalog = result;
+  connected = true;
+  renderPresets();
+  document.querySelector('#integration-note').textContent = catalog.integration?.available
+    ? '全站接入已就绪 · 首次启用请刷新整个 Dashboard。应用和预览影响此服务器的所有浏览器，约 2 秒同步。'
+    : (catalog.integration?.message || '全站接入状态暂时不可用');
+}
+
+document.querySelector('#editor').addEventListener('submit', event => event.preventDefault());
+document.querySelector('#editor').addEventListener('input', () => { dirty = true; updatePreview(); });
+document.querySelector('#save').onclick = () => run(async () => {
+  const state = await bridge().action('save', { theme: readEditor(), preset_id: savedId, revision: catalog.revision });
+  catalog = { ...catalog, ...state };
+  savedId = savedId || state.presets.at(-1).id;
+  activeId = savedId;
+  dirty = false;
+  renderPresets();
+  showStatus('预设已保存。点击“应用到 Dashboard”启用全站风格。');
+});
+document.querySelector('#save-copy').onclick = () => run(async () => {
+  const state = await bridge().action('save', { theme: readEditor(), preset_id: '', revision: catalog.revision });
+  catalog = { ...catalog, ...state };
+  activeId = savedId = state.presets.at(-1).id;
+  dirty = false;
+  renderPresets();
+  showStatus('已另存为个人预设');
+});
+document.querySelector('#delete').onclick = () => run(async () => {
+  const state = await bridge().action('delete', { preset_id: savedId, revision: catalog.revision });
+  catalog = { ...catalog, ...state };
+  savedId = '';
+  activeId = 'workbench';
+  dirty = false;
+  fillEditor(DEFAULT_THEME);
+  updatePreview();
+  renderPresets();
+  showStatus('个人预设已删除；已应用的外观可通过“恢复原外观”撤销。');
+});
+document.querySelector('#preview-site').onclick = () => run(async () => {
+  await appearanceAction('preview', readEditor());
+  const generation = ++previewGeneration;
+  showStatus('全站预览中，所有浏览器将在 20 秒后自动恢复。');
+  setTimeout(() => { if (generation === previewGeneration) showStatus('预览结束，已恢复原外观'); }, 20000);
+});
+document.querySelector('#apply').onclick = () => run(async () => {
+  await appearanceAction('apply', readEditor());
+  previewGeneration++;
+  showStatus('已保存服务器全站外观，约 2 秒同步；首次使用请刷新整个 Dashboard。');
+});
+document.querySelector('#restore').onclick = () => run(async () => {
+  await appearanceAction('reset');
+  previewGeneration++;
+  showStatus('已恢复 Dashboard 原有外观');
+});
+document.querySelector('#refresh').onclick = () => run(async () => { await refresh(); showStatus('预设列表已刷新，编辑内容已保留'); });
+fillEditor(BUILTIN_PRESETS[0].theme);
+renderPresets();
+updatePreview();
+await run(async () => {
+  await bridge().ready;
+  await refresh();
+  showStatus('工作台已就绪');
+});
+
+</script>
+</body>
+</html>

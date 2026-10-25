@@ -1,9 +1,9 @@
 {
   "manifest_version": 2,
   "id": "sallos.toolbox",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "name": "Sallos 工具箱",
-  "description": "MaiBot 的 Sallos 工具箱，提供基础连通检查与后续工具扩展入口。",
+  "description": "模块化 MaiBot 工具箱：全站外观与布局定制、预设管理、连通检查。自带 Dashboard 1.9.9 静态资源适配与恢复。",
   "author": {
     "name": "Sallos",
     "url": "https://github.com/Sa11os"
@@ -15,7 +15,7 @@
   },
   "host_application": {
     "min_version": "1.3.15",
-    "max_version": "999.999.999"
+    "max_version": "1.3.99"
   },
   "sdk": {
     "min_version": "2.16.0",

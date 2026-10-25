@@ -1,0 +1,484 @@
+{
+  "schema_version": 2,
+  "required_capabilities": [
+    "custom_pages",
+    "structured_arguments"
+  ],
+  "workspace_title": "Sallos 工具箱",
+  "pages": [
+    {
+      "id": "appearance",
+      "title": "外观",
+      "placement": "workspace",
+      "icon": "settings",
+      "mode": "custom",
+      "entry": "web/appearance.html",
+      "layout": "document",
+      "queries": {
+        "catalog": {
+          "api": "appearance_catalog"
+        }
+      },
+      "actions": {
+        "apply": {
+          "api": "appearance_apply",
+          "parameters": {
+            "theme": {
+              "type": "object",
+              "required": true,
+              "properties": {
+                "version": {
+                  "type": "integer",
+                  "required": true
+                },
+                "name": {
+                  "type": "string",
+                  "required": true,
+                  "max_length": 40
+                },
+                "mode": {
+                  "type": "string",
+                  "required": true,
+                  "choices": [
+                    "light",
+                    "dark",
+                    "system"
+                  ]
+                },
+                "primary": {
+                  "type": "string",
+                  "required": true
+                },
+                "background": {
+                  "type": "string",
+                  "required": true
+                },
+                "surface": {
+                  "type": "string",
+                  "required": true
+                },
+                "text": {
+                  "type": "string",
+                  "required": true
+                },
+                "muted": {
+                  "type": "string",
+                  "required": true
+                },
+                "border": {
+                  "type": "string",
+                  "required": true
+                },
+                "sidebar_side": {
+                  "type": "string",
+                  "required": true,
+                  "choices": [
+                    "left",
+                    "right"
+                  ]
+                },
+                "sidebar_width": {
+                  "type": "integer",
+                  "required": true,
+                  "minimum": 160,
+                  "maximum": 360
+                },
+                "header_height": {
+                  "type": "integer",
+                  "required": true,
+                  "minimum": 48,
+                  "maximum": 96
+                },
+                "content_width": {
+                  "type": "integer",
+                  "required": true,
+                  "minimum": 720,
+                  "maximum": 2560
+                },
+                "gap": {
+                  "type": "integer",
+                  "required": true,
+                  "minimum": 8,
+                  "maximum": 40
+                },
+                "font": {
+                  "type": "string",
+                  "required": true,
+                  "choices": [
+                    "system",
+                    "serif",
+                    "mono"
+                  ]
+                },
+                "font_size": {
+                  "type": "integer",
+                  "required": true,
+                  "minimum": 14,
+                  "maximum": 22
+                },
+                "line_height": {
+                  "type": "number",
+                  "required": true,
+                  "minimum": 1.2,
+                  "maximum": 2.0
+                },
+                "radius": {
+                  "type": "integer",
+                  "required": true,
+                  "minimum": 0,
+                  "maximum": 24
+                },
+                "shadow": {
+                  "type": "string",
+                  "required": true,
+                  "choices": [
+                    "none",
+                    "soft",
+                    "crisp"
+                  ]
+                },
+                "regions": {
+                  "type": "object",
+                  "required": true,
+                  "properties": {
+                    "sidebar": {
+                      "type": "string",
+                      "required": true,
+                      "max_length": 2000
+                    },
+                    "header": {
+                      "type": "string",
+                      "required": true,
+                      "max_length": 2000
+                    },
+                    "card": {
+                      "type": "string",
+                      "required": true,
+                      "max_length": 2000
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "confirmation": "将这套外观应用到此服务器的所有 Dashboard 浏览器？"
+        },
+        "preview": {
+          "api": "appearance_preview",
+          "parameters": {
+            "theme": {
+              "type": "object",
+              "required": true,
+              "properties": {
+                "version": {
+                  "type": "integer",
+                  "required": true
+                },
+                "name": {
+                  "type": "string",
+                  "required": true,
+                  "max_length": 40
+                },
+                "mode": {
+                  "type": "string",
+                  "required": true,
+                  "choices": [
+                    "light",
+                    "dark",
+                    "system"
+                  ]
+                },
+                "primary": {
+                  "type": "string",
+                  "required": true
+                },
+                "background": {
+                  "type": "string",
+                  "required": true
+                },
+                "surface": {
+                  "type": "string",
+                  "required": true
+                },
+                "text": {
+                  "type": "string",
+                  "required": true
+                },
+                "muted": {
+                  "type": "string",
+                  "required": true
+                },
+                "border": {
+                  "type": "string",
+                  "required": true
+                },
+                "sidebar_side": {
+                  "type": "string",
+                  "required": true,
+                  "choices": [
+                    "left",
+                    "right"
+                  ]
+                },
+                "sidebar_width": {
+                  "type": "integer",
+                  "required": true,
+                  "minimum": 160,
+                  "maximum": 360
+                },
+                "header_height": {
+                  "type": "integer",
+                  "required": true,
+                  "minimum": 48,
+                  "maximum": 96
+                },
+                "content_width": {
+                  "type": "integer",
+                  "required": true,
+                  "minimum": 720,
+                  "maximum": 2560
+                },
+                "gap": {
+                  "type": "integer",
+                  "required": true,
+                  "minimum": 8,
+                  "maximum": 40
+                },
+                "font": {
+                  "type": "string",
+                  "required": true,
+                  "choices": [
+                    "system",
+                    "serif",
+                    "mono"
+                  ]
+                },
+                "font_size": {
+                  "type": "integer",
+                  "required": true,
+                  "minimum": 14,
+                  "maximum": 22
+                },
+                "line_height": {
+                  "type": "number",
+                  "required": true,
+                  "minimum": 1.2,
+                  "maximum": 2.0
+                },
+                "radius": {
+                  "type": "integer",
+                  "required": true,
+                  "minimum": 0,
+                  "maximum": 24
+                },
+                "shadow": {
+                  "type": "string",
+                  "required": true,
+                  "choices": [
+                    "none",
+                    "soft",
+                    "crisp"
+                  ]
+                },
+                "regions": {
+                  "type": "object",
+                  "required": true,
+                  "properties": {
+                    "sidebar": {
+                      "type": "string",
+                      "required": true,
+                      "max_length": 2000
+                    },
+                    "header": {
+                      "type": "string",
+                      "required": true,
+                      "max_length": 2000
+                    },
+                    "card": {
+                      "type": "string",
+                      "required": true,
+                      "max_length": 2000
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "confirmation": "所有 Dashboard 浏览器将预览此风格 20 秒，随后自动恢复。继续？"
+        },
+        "reset": {
+          "api": "appearance_reset",
+          "confirmation": "恢复此服务器的原有 Dashboard 外观？"
+        },
+        "save": {
+          "api": "appearance_save",
+          "parameters": {
+            "theme": {
+              "type": "object",
+              "required": true,
+              "properties": {
+                "version": {
+                  "type": "integer",
+                  "required": true
+                },
+                "name": {
+                  "type": "string",
+                  "required": true,
+                  "max_length": 40
+                },
+                "mode": {
+                  "type": "string",
+                  "required": true,
+                  "choices": [
+                    "light",
+                    "dark",
+                    "system"
+                  ]
+                },
+                "primary": {
+                  "type": "string",
+                  "required": true
+                },
+                "background": {
+                  "type": "string",
+                  "required": true
+                },
+                "surface": {
+                  "type": "string",
+                  "required": true
+                },
+                "text": {
+                  "type": "string",
+                  "required": true
+                },
+                "muted": {
+                  "type": "string",
+                  "required": true
+                },
+                "border": {
+                  "type": "string",
+                  "required": true
+                },
+                "sidebar_side": {
+                  "type": "string",
+                  "required": true,
+                  "choices": [
+                    "left",
+                    "right"
+                  ]
+                },
+                "sidebar_width": {
+                  "type": "integer",
+                  "required": true,
+                  "minimum": 160,
+                  "maximum": 360
+                },
+                "header_height": {
+                  "type": "integer",
+                  "required": true,
+                  "minimum": 48,
+                  "maximum": 96
+                },
+                "content_width": {
+                  "type": "integer",
+                  "required": true,
+                  "minimum": 720,
+                  "maximum": 2560
+                },
+                "gap": {
+                  "type": "integer",
+                  "required": true,
+                  "minimum": 8,
+                  "maximum": 40
+                },
+                "font": {
+                  "type": "string",
+                  "required": true,
+                  "choices": [
+                    "system",
+                    "serif",
+                    "mono"
+                  ]
+                },
+                "font_size": {
+                  "type": "integer",
+                  "required": true,
+                  "minimum": 14,
+                  "maximum": 22
+                },
+                "line_height": {
+                  "type": "number",
+                  "required": true,
+                  "minimum": 1.2,
+                  "maximum": 2.0
+                },
+                "radius": {
+                  "type": "integer",
+                  "required": true,
+                  "minimum": 0,
+                  "maximum": 24
+                },
+                "shadow": {
+                  "type": "string",
+                  "required": true,
+                  "choices": [
+                    "none",
+                    "soft",
+                    "crisp"
+                  ]
+                },
+                "regions": {
+                  "type": "object",
+                  "required": true,
+                  "properties": {
+                    "sidebar": {
+                      "type": "string",
+                      "required": true,
+                      "max_length": 2000
+                    },
+                    "header": {
+                      "type": "string",
+                      "required": true,
+                      "max_length": 2000
+                    },
+                    "card": {
+                      "type": "string",
+                      "required": true,
+                      "max_length": 2000
+                    }
+                  }
+                }
+              }
+            },
+            "preset_id": {
+              "type": "string",
+              "required": true,
+              "max_length": 32
+            },
+            "revision": {
+              "type": "integer",
+              "required": true,
+              "minimum": 0
+            }
+          }
+        },
+        "delete": {
+          "api": "appearance_delete",
+          "parameters": {
+            "preset_id": {
+              "type": "string",
+              "required": true,
+              "max_length": 32
+            },
+            "revision": {
+              "type": "integer",
+              "required": true,
+              "minimum": 0
+            }
+          },
+          "confirmation": "删除这个个人外观预设？"
+        }
+      }
+    }
+  ]
+}

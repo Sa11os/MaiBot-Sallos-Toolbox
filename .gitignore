@@ -12,3 +12,8 @@ htmlcov/
 /dist/
 /build/
 *.egg-info/
+/.dev/
+/node_modules/
+/test-results/
+# Earlier manual-host-patch experiments remain local.
+/integrations/
