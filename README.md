@@ -1,12 +1,12 @@
 # Sallos 工具箱 · MaiBot 插件
 
-让麦麦，更像你的工作台。**0.2.1** 提供全站外观与布局定制，并以独立功能模块承载后续扩展。
+让麦麦，更像你的工作台。**0.2.2** 提供全站外观与布局定制，并以独立功能模块承载后续扩展。
 
 [下载插件 ZIP](https://github.com/Sa11os/MaiBot-Sallos-Toolbox/releases) · [问题反馈](https://github.com/Sa11os/MaiBot-Sallos-Toolbox/issues) · [MIT](LICENSE)
 
 ## 安装
 
-1. 下载 Release 中的 `MaiBot-Sallos-Toolbox-0.2.1.zip`。
+1. 下载 Release 中的 `MaiBot-Sallos-Toolbox-0.2.2.zip`。
 2. 在 MaiBot 插件管理页上传 ZIP，按宿主提示重启麦麦并启用插件。
 3. 刷新整个 Dashboard，进入顶部「Sallos 工具箱」→「外观」。
 4. 选择模板、调整布局，点击「应用到 Dashboard」并确认。约 2 秒同步到此服务器的浏览器。

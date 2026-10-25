@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "id": "sallos.toolbox",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "name": "Sallos 工具箱",
   "description": "模块化 MaiBot 工具箱：全站外观与布局定制、预设管理、连通检查。自带 Dashboard 1.9.9 静态资源适配与恢复。",
   "author": {
