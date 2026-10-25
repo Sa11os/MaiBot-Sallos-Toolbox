@@ -1,0 +1,30 @@
+{
+  "manifest_version": 2,
+  "id": "sallos.toolbox",
+  "version": "0.1.0",
+  "name": "Sallos 工具箱",
+  "description": "MaiBot 的 Sallos 工具箱，提供基础连通检查与后续工具扩展入口。",
+  "author": {
+    "name": "Sallos",
+    "url": "https://github.com/Sa11os"
+  },
+  "license": "MIT",
+  "urls": {
+    "repository": "https://github.com/Sa11os/MaiBot-Sallos-Toolbox",
+    "issues": "https://github.com/Sa11os/MaiBot-Sallos-Toolbox/issues"
+  },
+  "host_application": {
+    "min_version": "1.3.15",
+    "max_version": "999.999.999"
+  },
+  "sdk": {
+    "min_version": "2.16.0",
+    "max_version": "2.99.99"
+  },
+  "dependencies": [],
+  "plugin_type": "tool",
+  "capabilities": ["send.text"],
+  "i18n": {
+    "default_locale": "zh-CN"
+  }
+}
