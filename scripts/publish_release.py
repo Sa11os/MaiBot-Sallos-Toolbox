@@ -43,6 +43,7 @@ def publish():
         with tempfile.TemporaryDirectory() as temporary:
             command = [
                 "curl",
+                "--ipv4",
                 "--config",
                 "-",
                 "--silent",
