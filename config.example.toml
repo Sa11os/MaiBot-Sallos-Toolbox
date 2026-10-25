@@ -1,0 +1,10 @@
+# Generated from ToolboxConfig; fresh-install defaults only.
+
+
+[plugin]
+config_version = "1.1.0"
+enabled = true
+ping_reply = "pong！Sallos 工具箱已就绪喵~"
+
+[appearance]
+enabled = true

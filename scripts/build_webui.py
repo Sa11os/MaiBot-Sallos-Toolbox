@@ -6,6 +6,8 @@ import re
 import sys
 from pathlib import Path
 
+from build_config import default_config_toml
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
@@ -107,6 +109,7 @@ def build(check: bool = False) -> None:
         ],
     }
     outputs = {
+        ROOT / "config.example.toml": default_config_toml(),
         generated: data_js,
         ROOT / "web/appearance.html": html,
         ROOT / "webui.json": json.dumps(declaration, ensure_ascii=False, indent=2) + "\n",
